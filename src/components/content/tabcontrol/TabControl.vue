@@ -23,6 +23,7 @@ export default {
   methods: {
     itemClick(index) {
       this.itemActive = index;
+      this.$emit('tabClick',index);
     }
   },
   props: {
@@ -44,6 +45,7 @@ export default {
   height: 40px;
   line-height: 40px;
   background-color: #fff;
+  z-index: 99
 }
 .tab-control-item {
   flex: 1;
