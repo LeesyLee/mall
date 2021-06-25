@@ -7,7 +7,8 @@
     </nav-bar>
 
     <!-- 用scroll包裹实现顺滑滚动 -->
-    <scroll class="scroll-content" ref = "Hscroll">
+    <scroll class="scroll-content" ref="Hscroll" :probe-type="3" :pull-up-load="true" @backTop="showBackTop"
+      @pullingUp="loadMore">
       <home-swiper :banner="banner"></home-swiper>
       <recommend-view :recommend="recommend"></recommend-view>
       <feature-view></feature-view>
@@ -15,7 +16,7 @@
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
 
-    <back-top @click.native = "backClick"></back-top>
+    <back-top @click.native="backClick" v-show='isShowBackTop'></back-top>
 
 
 
@@ -80,6 +81,8 @@
   import BackTop from 'components/common/backtop/BackTop';
 
   import { getHomeMultidata, getHomeGoods } from "network/home";
+  import {debounce} from 'common/utils.js';
+
 
   export default {
     name: "Home",
@@ -93,7 +96,8 @@
           sell: { page: 0, list: [] },
         },
         currentType: "pop",
-        bscroll: null
+        bscroll: null,
+        isShowBackTop: false
       };
     },
     computed: {
@@ -115,20 +119,46 @@
       //1.请求多个数据
       this.mgetHomeMultidata();
       //2. 请求商品数据
+      // setTimeout(() => {
+      //   this.mgetHomeGoods("pop");
+
+      // }, 2000);
       this.mgetHomeGoods("pop");
       this.mgetHomeGoods("new");
       this.mgetHomeGoods("sell");
+      //3. 监听item中图片加载完成
+      // this.$bus.$on('itemImgLoad', () => {
+      //   this.$refs.Hscroll.refresh();
+      // })
+
     },
     mounted() {
       // console.log(this.$refs.wrapper);
       // this.bscroll = new BTscroll(this.$refs.wrapper, {
       // })
+      //3. 监听item中图片加载完成
+      // this.$bus.$on('itemImgLoad', () => {
+      //   this.$refs.Hscroll.refresh();
+      // })
+
+      //防抖函数返回的函数
+      // const refresh = this.debounce(this.$refs.Hscroll.refresh);
+      //用从utils.js中引入的debounce函数，不要this了
+      const refresh = debounce(this.$refs.Hscroll.refresh);
+
+      //3. 监听item中图片加载完成 + 防抖函数实现
+      this.$bus.$on('itemImgLoad', () => {
+        //  console.log(refresh);
+        refresh();
+      })
+
     },
     methods: {
       /**
        * 事件监听相关方法
        */
 
+      // 类型切换点击事件监听
       tabClick(index) {
         switch (index) {
           case 0:
@@ -143,23 +173,44 @@
         }
       },
 
+      //返回顶部
       backClick() {
-        this.scrollTo(0,0,1000);
-      },
-      //辅助backClick实现点击返回顶部功能
-      scrollTo(x = 0,y = 0,time = 800){
-        //x y time 的默认值分别为 0 0 800
         // console.log(this.$refs);
         //选中scroll组件标签
-        console.log(this.$refs.Hscroll);
+        // console.log(this.$refs.Hscroll);
         //选中scroll组件中的better-scroll对象
-        console.log(this.$refs.Hscroll.scroll);
+        // console.log(this.$refs.Hscroll.scroll);
         //利用scroll对象的scrollTo方法实现返回顶部
-        this.$refs.Hscroll.scroll.scrollTo(x,y,time);
+        //x y time 的默认值分别为 0 0 800
+        // this.$refs.Hscroll.scroll.scrollTo( 0, 0, 800);
+
+        this.$refs.Hscroll.scrollTo(0, 0, 1000);
       },
-      
+      showBackTop(position) {
+        // console.log(this.isShowBackTop);
+        // console.log(position);
+        this.isShowBackTop = -position.y > 1000 ? true : false;
+      },
 
+      //上拉加载更多
+      // 上拉加载更多-防抖函数
+      // 封装到/commom/utils.js
+      // debounce(func, delay) {
+      //   let timer = null;
+      //   return function (...args) {
+      //     if (timer) clearTimeout(timer);
+      //     timer = setTimeout(() => {
+      //       // console.log(this);
+      //       // console.log(args);
+      //       func.apply(this, args);
+      //     }, delay)
+      //   }
+      // },
 
+      loadMore() {
+        console.log('loadMore');
+        this.mgetHomeGoods(this.currentType);
+      },
 
       /**
        * 网络请求相关方法
@@ -179,6 +230,9 @@
           // console.log(res);
           this.goods[type].list.push(...res.data.list);
           this.goods[type].page += 1;
+
+          //完成此次上拉加载
+          this.$refs.Hscroll.finishPullUp();
         });
       },
     },
