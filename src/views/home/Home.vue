@@ -6,15 +6,23 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
+    <!-- 吸顶功能中的tab-control替代品 -->
+    <tab-control :titles="['流行', '新款', '精选']" class="tab-control-copy" @tabClick="tabClick" ref="tabControlCopy"
+      v-show="isTabFixed"></tab-control>
+
+
     <!-- 用scroll包裹实现顺滑滚动 -->
     <scroll class="scroll-content" ref="Hscroll" :probe-type="3" :pull-up-load="true" @backTop="showBackTop"
       @pullingUp="loadMore">
-      <home-swiper :banner="banner"></home-swiper>
+      <home-swiper :banner="banner" @swiperImgLoad="swiperImgLoad"></home-swiper>
       <recommend-view :recommend="recommend"></recommend-view>
       <feature-view></feature-view>
-      <tab-control :titles="['流行', '新款', '精选']" class="tab-control" @tabClick="tabClick"></tab-control>
+      <tab-control :titles="['流行', '新款', '精选']" class="tab-control" @tabClick="tabClick" ref="tabControl">
+      </tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
+
+
 
     <back-top @click.native="backClick" v-show='isShowBackTop'></back-top>
 
@@ -81,7 +89,7 @@
   import BackTop from 'components/common/backtop/BackTop';
 
   import { getHomeMultidata, getHomeGoods } from "network/home";
-  import {debounce} from 'common/utils.js';
+  import { debounce } from 'common/utils.js';
 
 
   export default {
@@ -97,7 +105,10 @@
         },
         currentType: "pop",
         bscroll: null,
-        isShowBackTop: false
+        isShowBackTop: false,
+        isTabFixed: false,
+        tabOffsetTop: 0,
+        positionY: 0
       };
     },
     computed: {
@@ -132,6 +143,15 @@
       // })
 
     },
+    activated(){
+      // console.log(this.$refs.Hscroll.getScrollY());
+      this.$refs.Hscroll.scrollTo(0,-this.positionY,0);
+      this.$refs.Hscroll.refresh();
+    },
+    deactivated(){
+      // console.log(this.$refs.Hscroll.getScrollY());
+      this.positionY = this.$refs.Hscroll.getScrollY();
+    },
     mounted() {
       // console.log(this.$refs.wrapper);
       // this.bscroll = new BTscroll(this.$refs.wrapper, {
@@ -153,10 +173,14 @@
       })
 
     },
-    methods: {
+    destroyed() {
+      console.log('Home.vue destroyed');
+    }
+    , methods: {
       /**
        * 事件监听相关方法
        */
+
 
       // 类型切换点击事件监听
       tabClick(index) {
@@ -171,6 +195,8 @@
             this.currentType = "sell";
             break;
         }
+        this.$refs.tabControl.itemActive = index;
+        this.$refs.tabControlCopy.itemActive = index;
       },
 
       //返回顶部
@@ -187,9 +213,13 @@
         this.$refs.Hscroll.scrollTo(0, 0, 1000);
       },
       showBackTop(position) {
+        //1. 判断backup是否显示
         // console.log(this.isShowBackTop);
         // console.log(position);
         this.isShowBackTop = -position.y > 1000 ? true : false;
+
+        //2. 判断tabcontrol是否吸顶-position:fixed
+        this.isTabFixed = -position.y > this.tabOffsetTop ? true : false;
       },
 
       //上拉加载更多
@@ -210,6 +240,13 @@
       loadMore() {
         console.log('loadMore');
         this.mgetHomeGoods(this.currentType);
+      },
+
+      //吸顶功能
+      swiperImgLoad() {
+        // console.log('HswiperImgLoad');
+        console.log(this.$refs.tabControl.$el.offsetTop);
+        this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop;
       },
 
       /**
@@ -247,11 +284,11 @@
   }
 
   .home-nav {
-    position: fixed;
+    /* position: fixed;
     left: 0;
     right: 0;
     top: 0;
-    bottom: 0;
+    bottom: 0; */
     background-color: var(--color-tint);
     color: #fff;
     z-index: 3;
@@ -278,4 +315,18 @@
     height: calc(100% - 44px - 49px);
     overflow: hidden
   } */
+
+  /* .tabFixed {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    right: 0;
+  } */
+
+  .tab-control-copy {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    right: 0;
+  }
 </style>

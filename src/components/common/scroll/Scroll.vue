@@ -61,6 +61,11 @@ export default {
     refresh() {
       console.log('refresh');
       this.scroll && this.scroll.refresh();
+    },
+
+    // 返回当前的滚动位置的y值
+    getScrollY() {
+      return this.scroll ? this.scroll : 0;
     }
   },
 };
