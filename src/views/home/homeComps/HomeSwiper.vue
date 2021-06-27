@@ -34,9 +34,9 @@ export default {
   methods: {
     swiperImgLoad() {
       if(!this.isEmit)
-      console.log('swiper');
+      // console.log('swiper');
       this.isEmit = !this.isEmit;
-      console.log(this.isEmit);
+      // console.log(this.isEmit);
       this.$emit('swiperImgLoad');
     }
   }

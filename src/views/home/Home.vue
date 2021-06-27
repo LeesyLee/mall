@@ -144,13 +144,17 @@
 
     },
     activated(){
+      // console.log('Home activated');
+      // console.log('positionY = ' + this.positionY);
       // console.log(this.$refs.Hscroll.getScrollY());
-      this.$refs.Hscroll.scrollTo(0,-this.positionY,0);
+      this.$refs.Hscroll.scrollTo(0,this.positionY,0);
       this.$refs.Hscroll.refresh();
     },
     deactivated(){
+      // console.log('Home deactivated');
       // console.log(this.$refs.Hscroll.getScrollY());
       this.positionY = this.$refs.Hscroll.getScrollY();
+      // console.log('positionY = ' + this.positionY);
     },
     mounted() {
       // console.log(this.$refs.wrapper);
@@ -238,14 +242,14 @@
       // },
 
       loadMore() {
-        console.log('loadMore');
+        // console.log('loadMore');
         this.mgetHomeGoods(this.currentType);
       },
 
       //吸顶功能
       swiperImgLoad() {
         // console.log('HswiperImgLoad');
-        console.log(this.$refs.tabControl.$el.offsetTop);
+        // console.log(this.$refs.tabControl.$el.offsetTop);
         this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop;
       },
 

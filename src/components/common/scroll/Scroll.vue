@@ -59,13 +59,14 @@ export default {
     },
     // 包装refresh方法
     refresh() {
-      console.log('refresh');
+      // console.log('refresh');
       this.scroll && this.scroll.refresh();
     },
 
     // 返回当前的滚动位置的y值
     getScrollY() {
-      return this.scroll ? this.scroll : 0;
+      // console.log(this.scroll.y);
+      return this.scroll ? this.scroll.y : 0;
     }
   },
 };
