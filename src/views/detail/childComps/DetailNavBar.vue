@@ -52,7 +52,13 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.detail-item {
+  position: relative;
+  background-color: #fff;
+  z-index: 10;
+}
+
 .title {
   display: flex;
 }
