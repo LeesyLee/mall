@@ -1,77 +1,74 @@
 <template>
-  <div>
-    <nav-bar class="detail-item">
-      <div class="back" slot="left" @click="back">
-        <img src="~assets/img/common/back.svg" alt="" />
+  <nav-bar class="detail-item">
+    <div class="back" slot="left" @click="back">
+      <img src="~assets/img/common/back.svg" alt="" />
+    </div>
+    <div class="title" slot="center">
+      <div v-for="(item, key) in titles" :key="key" class="title-item" @click="titleClick(key)"
+        :class="{ activeTitle: key === currentIndex }">
+        {{ item }}
       </div>
-      <div class="title" slot="center">
-        <div
-          v-for="(item, key) in titles"
-          :key="key"
-          class="title-item"
-          @click="titleClick(key)"
-          :class="{ activeTitle: key === currentIndex }"
-        >
-          {{ item }}
-        </div>
-      </div>
-    </nav-bar>
-  </div>
+    </div>
+  </nav-bar>
 </template>
 
 <script>
-//导入导航栏
-import NavBar from "components/common/navbar/NavBar";
+  //导入导航栏
+  import NavBar from "components/common/navbar/NavBar";
 
-export default {
-  name: "DetailNavBar",
-  data() {
-    return {
-      // iid: null,
-      titles: ["商品", "参数", "评论", "推荐"],
-      currentIndex: 0,
-    };
-  },
-  components: {
-    NavBar
-  },
-  methods: {
-    //点击title-商品 参数 评论
-    titleClick(index){
-      this.currentIndex = index;
+  export default {
+    name: "DetailNavBar",
+    data() {
+      return {
+        // iid: null,
+        titles: ["商品", "参数", "评论", "推荐"],
+        currentIndex: 0,
+      };
     },
-    //返回上一页
-    back() {
-      this.$router.back();
-    }
-  },
-  created() {
-    // this.iid = this.$route.params.iid;
-  },
-  mounted() {},
-};
+    components: {
+      NavBar
+    },
+    methods: {
+      //点击title-商品 参数 评论
+      titleClick(index) {
+        this.currentIndex = index;
+        this.$emit('titleClick', index);
+      },
+      //返回上一页
+      back() {
+        this.$router.back();
+      }
+    },
+    created() {
+      // this.iid = this.$route.params.iid;
+    },
+    mounted() { },
+  };
 </script>
 
 <style scoped>
-.detail-item {
-  position: relative;
-  background-color: #fff;
-  z-index: 10;
-}
+  .detail-item {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 10;
+  }
 
-.title {
-  display: flex;
-}
+  .title {
+    display: flex;
+  }
 
-.title-item {
-  flex: 1;
-}
+  .title-item {
+    flex: 1;
+  }
 
-.detail-item img {
-  margin-top: 10px;
-}
+  .detail-item img {
+    margin-top: 10px;
+  }
 
-.activeTitle {
-  color: var(--color-high-text);
-}
+  .activeTitle {
+    color: var(--color-high-text);
+  }
 </style>

@@ -86,10 +86,14 @@
   import GoodsList from "components/content/goods/GoodsList";
   import Scroll from "components/common/scroll/Scroll";
   import BTscroll from 'better-scroll';
-  import BackTop from 'components/common/backtop/BackTop';
+
+  //导入混入对象
+  import { itemListenerMixin, backTopMixin } from "common/mixin.js"
 
   import { getHomeMultidata, getHomeGoods } from "network/home";
   import { debounce } from 'common/utils.js';
+
+
 
 
   export default {
@@ -105,14 +109,16 @@
         },
         currentType: "pop",
         bscroll: null,
-        isShowBackTop: false,
         isTabFixed: false,
         tabOffsetTop: 0,
-        positionY: 0
+        positionY: 0,
+        // itemImgListener: null
       };
     },
+    mixins: [itemListenerMixin, backTopMixin],
     computed: {
       showGoods() {
+        // console.log(this.goods[this.currentType].list);
         return this.goods[this.currentType].list;
       }
     },
@@ -123,8 +129,7 @@
       FeatureView,
       TabControl,
       GoodsList,
-      Scroll,
-      BackTop
+      Scroll
     },
     created() {
       //1.请求多个数据
@@ -143,18 +148,20 @@
       // })
 
     },
-    activated(){
+    activated() {
       // console.log('Home activated');
       // console.log('positionY = ' + this.positionY);
       // console.log(this.$refs.Hscroll.getScrollY());
-      this.$refs.Hscroll.scrollTo(0,this.positionY,0);
+      this.$refs.Hscroll.scrollTo(0, this.positionY, 0);
       this.$refs.Hscroll.refresh();
     },
-    deactivated(){
+    deactivated() {
       // console.log('Home deactivated');
       // console.log(this.$refs.Hscroll.getScrollY());
       this.positionY = this.$refs.Hscroll.getScrollY();
       // console.log('positionY = ' + this.positionY);
+      //离开首页取消全局事件的取消
+      this.$bus.$off('itemImgLoad', this.itemImgListener);
     },
     mounted() {
       // console.log(this.$refs.wrapper);
@@ -168,19 +175,21 @@
       //防抖函数返回的函数
       // const refresh = this.debounce(this.$refs.Hscroll.refresh);
       //用从utils.js中引入的debounce函数，不要this了
-      const refresh = debounce(this.$refs.Hscroll.refresh);
+      // console.log(debounce);
+      // let refresh = debounce(this.$refs.Hscroll.refresh);
 
-      //3. 监听item中图片加载完成 + 防抖函数实现
-      this.$bus.$on('itemImgLoad', () => {
-        //  console.log(refresh);
-        refresh();
-      })
+      // // //3. 监听item中图片加载完成 + 防抖函数实现
+      // this.itemImgListener = () => {
+      //   //  console.log(refresh);
+      //   refresh();
+      // }
+      // this.$bus.$on('itemImgLoad', this.itemImgListener);
 
     },
     destroyed() {
       console.log('Home.vue destroyed');
-    }
-    , methods: {
+    },
+    methods: {
       /**
        * 事件监听相关方法
        */
@@ -204,18 +213,18 @@
       },
 
       //返回顶部
-      backClick() {
-        // console.log(this.$refs);
-        //选中scroll组件标签
-        // console.log(this.$refs.Hscroll);
-        //选中scroll组件中的better-scroll对象
-        // console.log(this.$refs.Hscroll.scroll);
-        //利用scroll对象的scrollTo方法实现返回顶部
-        //x y time 的默认值分别为 0 0 800
-        // this.$refs.Hscroll.scroll.scrollTo( 0, 0, 800);
+      // backClick() {
+      //   // console.log(this.$refs);
+      //   //选中scroll组件标签
+      //   // console.log(this.$refs.Hscroll);
+      //   //选中scroll组件中的better-scroll对象
+      //   // console.log(this.$refs.Hscroll.scroll);
+      //   //利用scroll对象的scrollTo方法实现返回顶部
+      //   //x y time 的默认值分别为 0 0 800
+      //   // this.$refs.Hscroll.scroll.scrollTo( 0, 0, 800);
 
-        this.$refs.Hscroll.scrollTo(0, 0, 1000);
-      },
+      //   this.$refs.Hscroll.scrollTo(0, 0, 1000);
+      // },
       showBackTop(position) {
         //1. 判断backup是否显示
         // console.log(this.isShowBackTop);
