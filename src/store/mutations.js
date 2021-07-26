@@ -11,6 +11,7 @@ export default {
   },
   //part2 payload对于cartList来说是新物品
   [ADD_TO_CART](state, payload) {
+    payload.checked = true;
     state.cartList.push(payload);
   }
 
