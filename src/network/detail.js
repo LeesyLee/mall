@@ -25,6 +25,7 @@ export class GoodsBaseInfo {
     this.newPrice = itemInfo.price;
     this.oldPrice = itemInfo.oldPrice;
     this.discount = itemInfo.discountDesc;
+    this.lowNowPrice = itemInfo.lowNowPrice;
     //折扣背景颜色
     this.discountBgColor = itemInfo.discountBgColor;
     this.columns = columns;
