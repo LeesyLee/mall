@@ -12,6 +12,7 @@
     </scroll>
     <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
     <back-top @click.native="backClick" v-show='isShowBackTop'></back-top>
+    <!-- <toast :message="message" :show="show"></toast> -->
   </div>
 </template>
 
@@ -35,23 +36,18 @@
 
   //引入商品基本信息模块
   import DetailBaseInfo from "./childComps/DetailBaseInfo";
-
   //引入店铺信息模块
   import DetailShopInfo from "./childComps/DetailShopInfo";
-
   //引入下方图片详情
   import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
-
   //引入商品尺码参数信息
   import DetailParamsInfo from "./childComps/DetailParamsInfo";
-
   //引入商品评论模块
   import DetailCommentInfo from "./childComps/DetailCommentInfo";
-
   //引入底部导航栏
   import DetailBottomBar from "./childComps/DetailBottomBar";
-
-
+  //引入弹窗组件
+  import Toast from "components/common/toast/Toast"
 
 
   //引入scroll模块
@@ -64,6 +60,8 @@
   import { itemListenerMixin, backTopMixin } from "common/mixin.js";
 
   import BackTop from 'components/common/backtop/BackTop';
+
+  import { mapGetters, mapActions } from 'vuex';
 
 
 
@@ -96,6 +94,8 @@
         getThemeTopY: null,
         //当前navbar对应的index
         currentIndex: 0,
+        message: '',
+        show: false
       };
     },
     components: {
@@ -107,10 +107,15 @@
       DetailParamsInfo,
       DetailCommentInfo,
       DetailBottomBar,
+      Toast,
       Scroll,
-      GoodsList
+      GoodsList,
+
     },
     methods: {
+      ...mapActions([
+        'addCart'
+      ]),
       detailImageLoad() {
         // console.log('detail.vue收到GoodsInfo');
         //重新让detail.vue中的scroll组件计算滚动区域高度
@@ -167,7 +172,24 @@
         //添加商品至购物车
         // this.$store.commit('addCart',product);
         //使用actions先处理添加的物品
-        this.$store.dispatch('addCart',product);
+        // this.$store.dispatch('addCart',product).then(res => {
+        //   console.log(res);
+        // })
+        //借助mapActions，将addCart假装拉入当前Detail.vue组件中执行
+        this.addCart(product).then(res => {
+          // this.show = true;
+          // this.message = res;
+          // setTimeout(() => {
+          //   this.show = false;
+          // }, 1500)
+          //使用自定义插件Toast
+          //传入显示信息message和显示时间duration
+          // console.log(this.$toast);
+          console.log(res);
+          this.$toast.show(res)
+        })
+
+        //3. 添加到购物车成功
 
       }
 
